@@ -21,7 +21,10 @@ class StrategyTest extends TestCase
         $this->strategy = new Strategy($this->container);
     }
 
-    public function testDispatchWithClosure(): void
+    /**
+     * @test
+     */
+    public function dispatchWithClosure(): void
     {
         $result = $this->strategy->dispatch(
             static function () {

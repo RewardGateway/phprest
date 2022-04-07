@@ -3,7 +3,7 @@
 namespace Phprest\Test\Util;
 
 use Phprest\Application;
-use League\Container\Container;
+use Phprest\Container;
 use Phprest\Util\DataStructure\MimeProcessResult;
 use Phprest\Util\Mime;
 use PHPUnit\Framework\TestCase;

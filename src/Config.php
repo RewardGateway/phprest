@@ -53,8 +53,8 @@ class Config
         $this->setRouterStrategy(new RouterStrategy($this->getContainer()));
 
         $errorHandler = new BooBoo([new JsonXmlFormatter($this)]);
-        $errorHandler->silenceAllErrors(false);
-        $errorHandler->treatErrorsAsExceptions(true);
+        $errorHandler->silenceAllErrors(true);
+        $errorHandler->treatErrorsAsExceptions(false);
 
         $this->setErrorHandler($errorHandler);
     }

@@ -7,7 +7,6 @@ use Phprest\Util\DataStructure\MimeProcessResult;
 
 trait Mime
 {
-
     protected function processMime(string $mime): MimeProcessResult
     {
         $vendor = (string)$this->getContainer()->get(Application::CONTAINER_ID_VENDOR);

@@ -21,7 +21,10 @@ class Container extends \League\Container\Container
             $constructor = $reflection->getConstructor();
         } catch (\ReflectionException $e) {
             throw new \League\Container\Exception\ReflectionException(
-                sprintf('Unable to reflect on the class [%s], does the class exist and is it properly autoloaded?', $class)
+                sprintf(
+                    'Unable to reflect on the class [%s], does the class exist and is it properly autoloaded?',
+                    $class
+                )
             );
         }
 

@@ -55,6 +55,12 @@
             "dev-master": "1.0.x-dev"
         }
     },
+    "repositories": [
+        {
+            "type": "github",
+            "url": "git@github.com:RewardGateway/route.git"
+        }
+    ],
     "suggest": {
         "phprest/phprest-service-request-filter": "For filtering Entites.",
         "phprest/phprest-service-validator": "For validating Entities.",

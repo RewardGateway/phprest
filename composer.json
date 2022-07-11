@@ -68,11 +68,5 @@
     },
     "config": {
         "sort-packages": true
-    },
-    "repositories": [
-        {
-            "type": "github",
-            "url": "git@github.com:RewardGateway/route.git"
-        }
-    ]
+    }
 }

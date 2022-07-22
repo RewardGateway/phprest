@@ -3,7 +3,7 @@
 namespace Phprest\Test\Service\Logger;
 
 use InvalidArgumentException;
-use Phprest\Container;
+use League\Container\Container;
 use Phprest\Service\Logger\Config;
 use Phprest\Service\Logger\Getter;
 use Phprest\Service\Logger\Service;

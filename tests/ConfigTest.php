@@ -8,7 +8,7 @@ use Phprest\Config;
 use Phprest\Service\Logger\Config as LoggerConfig;
 use Phprest\Service\Logger\Service as LoggerService;
 use Phprest\Service\Hateoas;
-use Phprest\Container;
+use League\Container\Container;
 use League\Route\RouteCollection;
 use League\Event\Emitter;
 use Phprest\ErrorHandler\Handler\Log;
@@ -16,7 +16,6 @@ use PHPUnit\Framework\TestCase;
 
 class ConfigTest extends TestCase
 {
-
     /**
      * @dataProvider correctApiVersionsDataProvider
      *

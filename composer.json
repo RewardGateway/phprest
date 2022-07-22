@@ -19,7 +19,7 @@
         }
     ],
     "require": {
-        "php": "^7.4|^8.0",
+        "php": "^7.4 || ^8.0",
         "ext-json": "*",
         "league/booboo": "^1.1",
         "league/container": "^1.3",

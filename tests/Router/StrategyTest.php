@@ -5,7 +5,7 @@ namespace Phprest\Test\Router;
 use Phprest\Application;
 use Phprest\Router\Strategy;
 use Phprest\Service;
-use Phprest\Container;
+use League\Container\Container;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Phprest\HttpFoundation\Response;

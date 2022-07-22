@@ -5,7 +5,7 @@ namespace Phprest\Test\Util;
 use Phprest\Application;
 use Phprest\Stub\Controller\Routed as RoutedController;
 use Phprest\Router\RouteCollection;
-use Phprest\Container;
+use League\Container\Container;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use PHPUnit\Framework\TestCase;
 

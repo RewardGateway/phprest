@@ -4,6 +4,7 @@ namespace Phprest;
 
 use InvalidArgumentException;
 use League\BooBoo\BooBoo;
+use League\Container\Container;
 use League\Container\ContainerInterface;
 use League\Event\Emitter as EventEmitter;
 use League\Event\EmitterInterface as EventEmitterInterface;

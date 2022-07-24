@@ -10,11 +10,9 @@ use PHPUnit\Framework\TestCase;
 class RouteTest extends TestCase
 {
     /**
-     * @param string $method
-     *
      * @dataProvider methodProvider
      */
-    public function testSuccessValidation($method): void
+    public function testSuccessValidation(string $method): void
     {
         $route = new Route([
             'method' => $method,

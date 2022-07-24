@@ -5,6 +5,7 @@ namespace Phprest\Annotation;
 use InvalidArgumentException;
 use LogicException;
 use Phprest\Application;
+use Phprest\Util\Version;
 
 /**
  * @Annotation
@@ -26,7 +27,7 @@ class Route
     /**
      * @var null|string
      */
-    public $version;
+    public ?string $version;
 
     /**
      * @param mixed $options
@@ -86,72 +87,72 @@ class Route
      */
     protected function getSinceUntilRegExp($sinceVersion, $untilVersion)
     {
-        $sinceVersion = str_pad($sinceVersion, 3, '.0');
-        $untilVersion = str_pad($untilVersion, 3, '.0');
+        $sinceVersion = new Version($sinceVersion);
+        $untilVersion = new Version($untilVersion);
 
-        if (! ($sinceVersion < $untilVersion)) {
+        if (version_compare($sinceVersion->version, $untilVersion->version, 'gt')) {
             throw new LogicException('since must be lesser than until');
         }
 
-        if ($sinceVersion[0] === $untilVersion[0]) {
+        if ($sinceVersion->major === $untilVersion->major) {
             return sprintf(
                 '(?:%d\.[%d-%d])',
-                $sinceVersion[0],
-                $sinceVersion[2],
-                $untilVersion[2]
+                $sinceVersion->major,
+                $sinceVersion->minor,
+                $untilVersion->minor
             );
-        } elseif (abs($sinceVersion[0] - $untilVersion[0]) === 1) {
+        } elseif (abs($sinceVersion->major - $untilVersion->major) === 1) {
             return sprintf(
                 '(?:%d\.[%d-9])|(?:%d\.[0-%d])',
-                $sinceVersion[0],
-                $sinceVersion[2],
-                $untilVersion[0],
-                $untilVersion[2]
+                $sinceVersion->major,
+                $sinceVersion->minor,
+                $untilVersion->major,
+                $untilVersion->minor
             );
         } else {
             return sprintf(
                 '(?:%d\.[%d-9])|(?:%d\.[0-%d])|(?:[%d-%d]\.\d)',
-                $sinceVersion[0],
-                $sinceVersion[2],
-                $untilVersion[0],
-                $untilVersion[2],
-                9 < $sinceVersion[0] + 1 ? 9 : $sinceVersion[0] + 1,
-                0 > $untilVersion[0] - 1 ? 0 : $untilVersion[0] - 1
+                $sinceVersion->major,
+                $sinceVersion->minor,
+                $untilVersion->major,
+                $untilVersion->minor,
+                min(9, $sinceVersion->major + 1),
+                max(0, $untilVersion->major - 1)
             );
         }
     }
 
     /**
-     * @param string $version
+     * @param string $versionString
      *
      * @return string
      */
-    protected function getSinceRegExp($version): string
+    protected function getSinceRegExp($versionString): string
     {
-        $version = str_pad($version, 3, '.0');
+        $version = new Version($versionString);
 
         return sprintf(
             '(?:[%d-9]\.[%d-9])|(?:[%d-9]\.\d)',
-            $version[0],
-            $version[2],
-            9 < $version[0] + 1 ? 9 : $version[0] + 1
+            $version->major,
+            $version->minor,
+            min(9, $version->major + 1)
         );
     }
 
     /**
-     * @param string $version
+     * @param string $versionString
      *
      * @return string
      */
-    protected function getUntilRegExp($version): string
+    protected function getUntilRegExp($versionString): string
     {
-        $version = str_pad($version, 3, '.0');
+        $version = new Version($versionString);
 
         return sprintf(
             '(?:[0-%d]\.[0-%d])|(?:[0-%d]\.\d)',
-            $version[0],
-            $version[2],
-            0 > $version[0] - 1 ? 0 : $version[0] - 1
+            $version->major,
+            $version->minor,
+            max(0, $version->major - 1)
         );
     }
 }

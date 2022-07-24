@@ -28,12 +28,14 @@ class Get extends Command
     }
 
     /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     *
      * @return void
+     *
+     * Return type of this method doesn't match to extended method.
+     * Keeping it generic to avoid future BC issues.
+     *
+     * @phpstan-ignore-next-line
      */
-    protected function execute(InputInterface $input, OutputInterface $output): void
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         $routes         = [];
         $routingTable   = $this->app->getRouter()->getRoutingTable();

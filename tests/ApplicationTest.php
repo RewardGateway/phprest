@@ -21,7 +21,7 @@ class ApplicationTest extends TestCase
 
     public function setUp(): void
     {
-        $this->config = new Config('phprest-test', 1, true);
+        $this->config = new Config('phprest-test', '1', true);
         $this->app = new Application($this->config);
     }
 

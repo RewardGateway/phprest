@@ -3,7 +3,7 @@ name: CI
 on: [push]
 
 jobs:
-  build:
+  test-php74:
 
     runs-on: ubuntu-latest
     
@@ -14,6 +14,8 @@ jobs:
       with:
         php-version: '7.4'
         tools: composer, phpunit
+      env:
+        COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Install dependencies
       run: composer install
     - name: Run unit tests
@@ -21,4 +23,46 @@ jobs:
     - name: Run PHPCS check
       run: vendor/bin/phpcs --report-full --standard=PSR12 src
     - name: Run phpstan check
-      run: vendor/bin/phpstan analyse src tests --level 1
+      run: vendor/bin/phpstan analyse
+
+  test-php80:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.0'
+          tools: composer, phpunit
+        env:
+          COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install dependencies
+        run: composer install
+      - name: Run unit tests
+        run: vendor/bin/phpunit
+      - name: Run PHPCS check
+        run: vendor/bin/phpcs --report-full --standard=PSR12 src
+      - name: Run phpstan check
+        run: vendor/bin/phpstan analyse
+
+  test-php81:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          tools: composer, phpunit
+        env:
+          COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install dependencies
+        run: composer install
+      - name: Run unit tests
+        run: vendor/bin/phpunit
+      - name: Run PHPCS check
+        run: vendor/bin/phpcs --report-full --standard=PSR12 src
+      - name: Run phpstan check
+        run: vendor/bin/phpstan analyse

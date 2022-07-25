@@ -8,7 +8,6 @@ use Monolog\Logger;
 
 trait Getter
 {
-
     protected function serviceLogger(): Logger
     {
         return $this->getContainer()->get(Config::getServiceName());

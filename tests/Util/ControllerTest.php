@@ -3,6 +3,7 @@
 namespace Phprest\Test\Util;
 
 use Phprest\Application;
+use Phprest\HttpFoundation\Response;
 use Phprest\Stub\Controller\Routed as RoutedController;
 use Phprest\Router\RouteCollection;
 use League\Container\Container;
@@ -27,6 +28,12 @@ class ControllerTest extends TestCase
         $container->add(Application::CONTAINER_ID_ROUTER, $this->router);
 
         $this->controller = new RoutedController($container);
+    }
+
+    public function testController()
+    {
+        $this->assertInstanceOf(Response::class, $this->controller::getFoo());
+        $this->assertInstanceOf(Response::class, $this->controller::postBar());
     }
 
     public function testRoutingTable(): void

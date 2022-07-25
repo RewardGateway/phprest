@@ -55,7 +55,7 @@ class Config
 
         $errorHandler = new BooBoo([new JsonXmlFormatter($this)]);
         $errorHandler->silenceAllErrors(false);
-        $errorHandler->treatErrorsAsExceptions(true);
+        $errorHandler->treatErrorsAsExceptions(false);
 
         $this->setErrorHandler($errorHandler);
     }

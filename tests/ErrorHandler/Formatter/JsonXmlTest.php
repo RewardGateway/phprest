@@ -18,7 +18,7 @@ class JsonXmlTest extends TestCase
 
     public function setUp(): void
     {
-        $this->config = new Config('phprest', 1, true);
+        $this->config = new Config('phprest', '1', true);
         $this->setContainerElements($this->config);
     }
 

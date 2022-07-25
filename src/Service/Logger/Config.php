@@ -7,7 +7,6 @@ use Phprest\Service\Configurable;
 
 class Config implements Configurable
 {
-
     public string $name;
 
     /**

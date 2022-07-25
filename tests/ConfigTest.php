@@ -16,7 +16,6 @@ use PHPUnit\Framework\TestCase;
 
 class ConfigTest extends TestCase
 {
-
     /**
      * @dataProvider correctApiVersionsDataProvider
      *
@@ -74,7 +73,7 @@ class ConfigTest extends TestCase
 
     public function testGetters(): void
     {
-        $config = new Config('phprest', 1, true);
+        $config = new Config('phprest', '1', true);
 
         $this->assertEquals('phprest', $config->getVendor());
         $this->assertEquals(1, $config->getApiVersion());
@@ -90,7 +89,7 @@ class ConfigTest extends TestCase
 
     public function testLoggerGetterSetter(): void
     {
-        $config = new Config('phprest', 1, true);
+        $config = new Config('phprest', '1', true);
 
         $loggerConfig = new LoggerConfig('test');
         $loggerService = new LoggerService();

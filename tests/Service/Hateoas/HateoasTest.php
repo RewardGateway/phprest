@@ -7,7 +7,7 @@ use Phprest\Service\Hateoas\Config;
 use Phprest\Service\Hateoas\Getter;
 use Phprest\Service\Hateoas\Service;
 use Phprest\Stub\Service\SampleConfig;
-use League\Container\Container;
+use Phprest\Container;
 use Hateoas\Hateoas;
 use PHPUnit\Framework\TestCase;
 

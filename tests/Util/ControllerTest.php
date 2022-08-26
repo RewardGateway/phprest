@@ -6,7 +6,7 @@ use Phprest\Application;
 use Phprest\HttpFoundation\Response;
 use Phprest\Stub\Controller\Routed as RoutedController;
 use Phprest\Router\RouteCollection;
-use League\Container\Container;
+use Phprest\Container;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use PHPUnit\Framework\TestCase;
 

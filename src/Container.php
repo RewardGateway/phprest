@@ -5,14 +5,27 @@ declare(strict_types=1);
 namespace Phprest;
 
 use ReflectionNamedType;
-use ReflectionType;
 
 use function class_exists;
+use function in_array;
 use function is_null;
 use function sprintf;
+use function mb_strtolower;
 
 class Container extends \League\Container\Container
 {
+    private const TYPES_TO_IGNORE = [
+        'bool',
+        'int',
+        'float',
+        'string',
+        'array',
+        'object',
+        'callable',
+        'iterable',
+        'resource',
+    ];
+
     /**
      * {@inheritDoc}
      */
@@ -40,9 +53,17 @@ class Container extends \League\Container\Container
         foreach ($constructor->getParameters() as $param) {
             $dependency = $param->getType();
 
-            if ($dependency instanceof ReflectionNamedType && class_exists($dependency->getName())) {
-                // if the dependency is a class, just register its name as an
-                // argument with the definition
+            // if the dependency is a class, just register its name as an
+            // argument with the definition
+            if (
+                $dependency instanceof ReflectionNamedType
+                && !in_array(mb_strtolower($dependency->getName()), self::TYPES_TO_IGNORE, true)
+                && (
+                    $this->isSingleton($dependency->getName())
+                    || $this->isRegistered($dependency->getName())
+                    || class_exists($dependency->getName())
+                )
+            ) {
                 $definition->withArgument($dependency->getName());
                 continue;
             }

@@ -23,9 +23,10 @@ class Container extends \League\Container\Container
             $reflection  = new \ReflectionClass($class);
             $constructor = $reflection->getConstructor();
         } catch (\ReflectionException $e) {
-            throw new \League\Container\Exception\ReflectionException(
-                sprintf('Unable to reflect on the class [%s], does the class exist and is it properly autoloaded?', $class)
-            );
+            throw new \League\Container\Exception\ReflectionException(sprintf(
+                'Unable to reflect on the class [%s], does the class exist and is it properly autoloaded?',
+                $class
+            ));
         }
 
         $factory = $this->getDefinitionFactory();

@@ -40,21 +40,22 @@ class Container extends \League\Container\Container
         foreach ($constructor->getParameters() as $param) {
             $dependency = $param->getType();
 
-            // if the dependency is not a class we attempt to get a default value
-            if (is_null($dependency) || !class_exists($dependency->getName())) {
-                if ($param->isDefaultValueAvailable()) {
-                    $definition->withArgument($param->getDefaultValue());
-                    continue;
-                }
-
-                throw new \League\Container\Exception\UnresolvableDependencyException(
-                    sprintf('Unable to resolve a non-class dependency of [%s] for [%s]', $param, $class)
-                );
+            if ($dependency instanceof ReflectionNamedType && class_exists($dependency->getName())) {
+                // if the dependency is a class, just register its name as an
+                // argument with the definition
+                $definition->withArgument($dependency->getName());
+                continue;
             }
 
-            // if the dependency is a class, just register its name as an
-            // argument with the definition
-            $definition->withArgument($dependency->getName());
+            // if the dependency is not a class we attempt to get a default value
+            if ($param->isDefaultValueAvailable()) {
+                $definition->withArgument($param->getDefaultValue());
+                continue;
+            }
+
+            throw new \League\Container\Exception\UnresolvableDependencyException(
+                sprintf('Unable to resolve a non-class dependency of [%s] for [%s]', $param, $class)
+            );
         }
 
         return $definition;

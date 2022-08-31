@@ -3,7 +3,7 @@
 namespace Phprest\Test\Service\Hateoas;
 
 use Phprest\Application;
-use League\Container\Container;
+use Phprest\Container;
 use Phprest\Exception\NotAcceptable;
 use Phprest\Exception\UnsupportedMediaType;
 use Phprest\Service\Hateoas\Config;

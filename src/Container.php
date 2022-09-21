@@ -6,6 +6,7 @@ namespace Phprest;
 
 use ReflectionNamedType;
 
+use function array_key_exists;
 use function class_exists;
 use function in_array;
 use function is_null;
@@ -25,6 +26,21 @@ class Container extends \League\Container\Container
         'iterable',
         'resource',
     ];
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isSingleton($alias)
+    {
+        return (
+            array_key_exists($alias, $this->singletons)
+            || (
+                array_key_exists($alias, $this->items)
+                && isset($this->items[$alias]['singleton'])
+                && $this->items[$alias]['singleton'] === true
+            )
+        );
+    }
 
     /**
      * {@inheritDoc}

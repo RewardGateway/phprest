@@ -44,6 +44,14 @@ class ContainerTest extends TestCase
         $this->expectException(UnresolvableDependencyException::class);
         $obj->get(TestCaseClass2::class);
     }
+
+    public function testResolvingDynamiclyDefinedDependenciesOfClasses()
+    {
+        $obj = new Container();
+
+        $this->assertInstanceOf(TestCaseClass3::class, $obj->get(TestCaseClass3::class));
+        $this->assertInstanceOf(TestCaseClass31::class, $obj->get(TestCaseClass31::class));
+    }
 }
 
 interface RegisteredInterface {}
@@ -146,4 +154,11 @@ class TestCaseClass2
     {
         $this->unresolvableClass = $unresolvableClass;
     }
+}
+
+class TestCaseClass3 {}
+
+class TestCaseClass31
+{
+    public function __construct(TestCaseClass3 $testCase3) {}
 }

@@ -160,5 +160,10 @@ class TestCaseClass3 {}
 
 class TestCaseClass31
 {
-    public function __construct(TestCaseClass3 $testCase3) {}
+    public TestCaseClass3 $testCase3;
+
+    public function __construct(TestCaseClass3 $testCase3)
+    {
+        $this->testCase3 = $testCase3;
+    }
 }

@@ -23,11 +23,6 @@ class UtilTest extends TestCase
 
     private Container $container;
 
-    public static function setUpBeforeClass(): void
-    {
-        AnnotationRegistry::registerLoader('class_exists');
-    }
-
     public function setUp(): void
     {
         $this->container = new Container();

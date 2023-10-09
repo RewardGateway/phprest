@@ -52,8 +52,6 @@ class Application implements
         $this->router = $configuration->getRouter();
         $this->emitter = $configuration->getEventEmitter();
 
-        AnnotationRegistry::registerLoader('class_exists');
-
         $this->registerService($configuration->getHateoasService(), $configuration->getHateoasConfig());
         $this->registerService($configuration->getLoggerService(), $configuration->getLoggerConfig());
 

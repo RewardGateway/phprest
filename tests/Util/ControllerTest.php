@@ -15,11 +15,6 @@ class ControllerTest extends TestCase
     private RoutedController $controller;
     private RouteCollection $router;
 
-    public static function setUpBeforeClass(): void
-    {
-        AnnotationRegistry::registerLoader('class_exists');
-    }
-
     public function setUp(): void
     {
         $this->router = new RouteCollection();

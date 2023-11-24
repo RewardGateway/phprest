@@ -60,8 +60,6 @@ class JsonXmlTest extends TestCase
      */
     protected function setContainerElements(Config $config): void
     {
-        AnnotationRegistry::registerLoader('class_exists');
-
         $config->getHateoasService()->register(
             $config->getContainer(),
             $config->getHateoasConfig()

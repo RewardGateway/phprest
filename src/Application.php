@@ -9,10 +9,10 @@ use League\Event\EmitterTrait;
 use League\Event\ListenerAcceptorInterface;
 use League\Route\Http\Exception\NotFoundException;
 use Phprest\Middleware\ApiVersion;
+use Phprest\Response\ResponseEmitter;
 use Phprest\Router\RouteCollection;
-use Phprest\Service;
 use Phprest\Util\RequestHelper;
-use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
+use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -105,9 +105,9 @@ class Application implements
         $app = $this->stackBuilder->resolve($this);
 
         $response = $app->handle($request, self::MAIN_REQUEST, false);
-        $response->send();
 
-        $app->terminate($request, $response);
+        $responseEmitter = new ResponseEmitter();
+        $responseEmitter->emit($response);
     }
 
     /**
@@ -117,26 +117,25 @@ class Application implements
      * @param int $type
      * @param bool $catch
      *
-     * @return Response
+     * @return ResponseInterface
+     *
      * @throws LogicException
      *
      * @throws Exception
      */
-    public function handle(Request $request, $type = self::MAIN_REQUEST, $catch = true): ?Response
+    public function handle(Request $request, $type = self::MAIN_REQUEST, $catch = true): ?ResponseInterface
     {
-        // Passes the request to the container
         $this->getContainer()->add(Request::class, $request);
 
         try {
             $this->emit('request.received', $request);
 
-            $psrRequest = RequestHelper::toPsr($request);
+            $router = $this->getRouter();
 
-            $dispatcher = $this->getRouter()->getDispatcher($psrRequest);
-            $psrResponse = $dispatcher->handle(RequestHelper::toPsr($request), RequestHelper::createResponse());
-
-            $httpFoundationFactory = new HttpFoundationFactory();
-            $response = $httpFoundationFactory->createResponse($psrResponse);
+            $response = $router->dispatch(
+                RequestHelper::toPsr($request),
+                RequestHelper::createResponse()
+            );
 
             $this->emit('response.created', $request, $response);
 

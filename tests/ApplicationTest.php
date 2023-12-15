@@ -7,7 +7,9 @@ use League\Route\Http\Exception\NotFoundException;
 use Phprest\Application;
 use Phprest\Config;
 use Phprest\Service;
+use Phprest\Util\RequestHelper;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Phprest\Router\RouteCollection;
@@ -47,8 +49,8 @@ class ApplicationTest extends TestCase
         $request = Request::create('/welcome');
         $request->headers->set('Accept', '*/*');
 
-        $this->app->get('/1.0/welcome', static function (Request $request) {
-            return new Response('Hello Phprest World', 200);
+        $this->app->get('/1.0/welcome', static function (ServerRequestInterface $request) {
+            return RequestHelper::toPsrResponse(new Response('Hello Phprest World', 200));
         });
 
         ob_start();

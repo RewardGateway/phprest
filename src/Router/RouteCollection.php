@@ -16,11 +16,6 @@ class RouteCollection extends LeagueRouteCollection
      */
     protected array $routingTable = [];
 
-    /**
-     * @param ContainerInterface $container
-     * @param RouteParser $parser
-     * @param DataGenerator $generator
-     */
     public function __construct(
         ContainerInterface $container = null,
         RouteParser $parser = null,

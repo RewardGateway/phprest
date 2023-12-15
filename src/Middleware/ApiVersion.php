@@ -7,6 +7,7 @@ use Negotiation\FormatNegotiator;
 use Phprest\Application;
 use Phprest\HttpFoundation\Request;
 use Phprest\Util;
+use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\HttpFoundation\Request as BaseRequest;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -27,7 +28,7 @@ class ApiVersion implements HttpKernelInterface
      * @param int $type
      * @param bool $catch
      *
-     * @return Response
+     * @return ResponseInterface
      */
     public function handle(BaseRequest $request, $type = self::MAIN_REQUEST, $catch = true)
     {

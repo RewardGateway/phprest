@@ -2,6 +2,7 @@
 
 namespace Phprest\Test;
 
+use League\Container\Container;
 use League\Event\EmitterInterface;
 use League\Route\Http\Exception\NotFoundException;
 use Phprest\Application;
@@ -29,11 +30,14 @@ class ApplicationTest extends TestCase
 
     public function testInstantiation(): void
     {
+        /** @var Container $container */
+        $container = $this->app->getContainer();
+
         $this->assertTrue(
-            $this->app->getContainer()->hasShared(Service\Hateoas\Config::getServiceName())
+            $container->hasShared(Service\Hateoas\Config::getServiceName())
         );
         $this->assertTrue(
-            $this->app->getContainer()->hasShared(Service\Logger\Config::getServiceName())
+            $container->hasShared(Service\Logger\Config::getServiceName())
         );
         $this->assertEquals('phprest-test', $this->app->getContainer()->get(Application::CONTAINER_ID_VENDOR));
         $this->assertEquals(1, $this->app->getContainer()->get(Application::CONTAINER_ID_API_VERSION));

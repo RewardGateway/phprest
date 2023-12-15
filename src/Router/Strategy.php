@@ -41,7 +41,7 @@ class Strategy extends AbstractStrategy implements StrategyInterface
      *     - array    (controller is a class method [0 => ClassName, 1 => MethodName])
      *     - \Closure (controller is an anonymous function)
      *
-     * @param  string|array|Closure $controller
+     * @param  callable $controller
      * @param  array $vars - named wildcard segments of the matched route
      *
      * @return mixed

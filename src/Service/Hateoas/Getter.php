@@ -3,6 +3,7 @@
 namespace Phprest\Service\Hateoas;
 
 use Hateoas\Hateoas;
+use League\Container\Container;
 use League\Container\ContainerInterface;
 
 trait Getter
@@ -15,7 +16,7 @@ trait Getter
     /**
      * Returns the DI container.
      *
-     * @return ContainerInterface
+     * @return Container&ContainerInterface
      */
     abstract protected function getContainer();
 }

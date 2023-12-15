@@ -111,13 +111,8 @@ class Application implements
     }
 
     /**
-     * Handle the request.
-     *
-     * @param Request $request
      * @param int $type
      * @param bool $catch
-     *
-     * @return ResponseInterface
      *
      * @throws LogicException
      *
@@ -148,7 +143,7 @@ class Application implements
             }
 
             $response = call_user_func($this->exceptionDecorator, $e);
-            if (!$response instanceof Response) {
+            if (!$response instanceof ResponseInterface) {
                 throw new LogicException(
                     'Exception decorator did not return an instance of Symfony\Component\HttpFoundation\Response'
                 );
@@ -302,7 +297,9 @@ class Application implements
         $this->setExceptionDecorator(static function (Exception $e) use ($app) {
             $formatter = new ErrorHandler\Formatter\JsonXml($app->configuration);
 
-            return new Response($formatter->format($e), http_response_code());
+            $symfonyResponse = new Response($formatter->format($e), http_response_code());
+
+            return RequestHelper::toPsrResponse($symfonyResponse);
         });
     }
 }

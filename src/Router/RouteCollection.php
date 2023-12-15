@@ -29,10 +29,10 @@ class RouteCollection extends LeagueRouteCollection
     /**
      * Add a route to the collection.
      *
-     * @param  string                                   $method
-     * @param  string                                   $route
-     * @param  string|Closure                          $handler
-     * @param StrategyInterface $strategy
+     * @param  string $httpMethod
+     * @param  string $route
+     * @param  string|Closure $handler
+     * @param StrategyInterface|null $strategy
      *
      * @return RouteCollection
      */

@@ -30,8 +30,6 @@ class Get extends Command
     /**
      * Return type of this method doesn't match to extended method.
      * Keeping it generic to avoid future BC issues.
-     *
-     * @phpstan-ignore-next-line
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

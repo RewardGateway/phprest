@@ -33,6 +33,6 @@ class Service implements Serviceable
             $hateoas->addMetadataDir($config->metadataDir);
         }
 
-        $container->add($config->getServiceName(), $hateoas->build());
+        $container->share($config->getServiceName(), $hateoas->build());
     }
 }

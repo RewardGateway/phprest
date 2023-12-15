@@ -5,6 +5,7 @@ namespace Phprest\Router;
 use Closure;
 use Hateoas\Hateoas;
 use League\Container\ContainerInterface;
+use League\Route\Route;
 use League\Route\Strategy\AbstractStrategy;
 use League\Route\Strategy\StrategyInterface;
 use Phprest\HttpFoundation\Response;
@@ -44,11 +45,11 @@ class Strategy extends AbstractStrategy implements StrategyInterface
      *
      * @return mixed
      */
-    public function dispatch($controller, array $vars)
+    public function dispatch(callable $controller, array $vars, Route $route = null)
     {
         $request = $this->container->get(Request::class);
 
-        $response = $this->invokeController($controller, array_merge(
+        $response = $this->dispatch($controller, array_merge(
             [$request],
             array_values($vars)
         ));

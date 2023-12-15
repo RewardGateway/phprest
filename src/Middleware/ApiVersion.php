@@ -29,7 +29,7 @@ class ApiVersion implements HttpKernelInterface
      *
      * @return Response
      */
-    public function handle(BaseRequest $request, $type = self::MASTER_REQUEST, $catch = true)
+    public function handle(BaseRequest $request, $type = self::MAIN_REQUEST, $catch = true)
     {
         $request        = new Request($request);
         $mimeProcResult = $this->processMime(

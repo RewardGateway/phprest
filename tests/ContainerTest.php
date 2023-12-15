@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Phprest\Test;
 
-use League\Container\Exception\UnresolvableDependencyException;
+use League\Container\Exception\NotFoundException;
 use Phprest\Container;
 use PHPUnit\Framework\TestCase;
 
@@ -41,7 +41,7 @@ class ContainerTest extends TestCase
     {
         $obj = new Container();
 
-        $this->expectException(UnresolvableDependencyException::class);
+        $this->expectException(NotFoundException::class);
         $obj->get(TestCaseClass2::class);
     }
 

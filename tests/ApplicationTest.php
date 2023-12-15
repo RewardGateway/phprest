@@ -28,10 +28,10 @@ class ApplicationTest extends TestCase
     public function testInstantiation(): void
     {
         $this->assertTrue(
-            $this->app->getContainer()->isSingleton(Service\Hateoas\Config::getServiceName())
+            $this->app->getContainer()->hasShared(Service\Hateoas\Config::getServiceName())
         );
         $this->assertTrue(
-            $this->app->getContainer()->isSingleton(Service\Logger\Config::getServiceName())
+            $this->app->getContainer()->hasShared(Service\Logger\Config::getServiceName())
         );
         $this->assertEquals('phprest-test', $this->app->getContainer()->get(Application::CONTAINER_ID_VENDOR));
         $this->assertEquals(1, $this->app->getContainer()->get(Application::CONTAINER_ID_API_VERSION));

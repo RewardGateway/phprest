@@ -6,9 +6,10 @@ use Closure;
 use FastRoute\DataGenerator;
 use FastRoute\RouteParser;
 use League\Container\ContainerInterface;
+use League\Route\RouteCollection as LeagueRouteCollection;
 use League\Route\Strategy\StrategyInterface;
 
-class RouteCollection extends \League\Route\RouteCollection
+class RouteCollection extends LeagueRouteCollection
 {
     /**
      * @var array keys: method, route, handler
@@ -40,12 +41,12 @@ class RouteCollection extends \League\Route\RouteCollection
      *
      * @return RouteCollection
      */
-    public function addRoute($method, $route, $handler, StrategyInterface $strategy = null): RouteCollection
+    public function addRoute($httpMethod, $route, $handler, StrategyInterface $strategy = null): RouteCollection
     {
-        parent::addRoute($method, $route, $handler, $strategy);
+        parent::addRoute($httpMethod, $route, $handler);
 
         $this->routingTable[] = [
-            'method'    => $method,
+            'method'    => $httpMethod,
             'route'     => $route,
             'handler'   => $handler,
         ];

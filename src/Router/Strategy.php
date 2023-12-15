@@ -5,6 +5,7 @@ namespace Phprest\Router;
 use Closure;
 use Hateoas\Hateoas;
 use League\Container\ContainerInterface;
+use League\Container\Exception\NotFoundException;
 use League\Route\Route;
 use League\Route\Strategy\AbstractStrategy;
 use League\Route\Strategy\StrategyInterface;
@@ -47,9 +48,14 @@ class Strategy extends AbstractStrategy implements StrategyInterface
      */
     public function dispatch(callable $controller, array $vars, Route $route = null)
     {
-        $request = $this->container->get(Request::class);
+        try {
+            $request = $this->container->get(Request::class);
+        } catch (NotFoundException) {
+            $request = Request::createFromGlobals();
+            $this->container->add(Request::class, $request);
+        }
 
-        $response = $this->dispatch($controller, array_merge(
+        $response = call_user_func_array($controller, array_merge(
             [$request],
             array_values($vars)
         ));

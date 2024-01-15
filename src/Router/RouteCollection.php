@@ -6,8 +6,12 @@ use Closure;
 use FastRoute\DataGenerator;
 use FastRoute\RouteParser;
 use League\Container\ContainerInterface;
+use League\Route\Middleware\ExecutionChain;
 use League\Route\RouteCollection as LeagueRouteCollection;
+use League\Route\Strategy\ApplicationStrategy;
 use League\Route\Strategy\StrategyInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class RouteCollection extends LeagueRouteCollection
 {
@@ -24,6 +28,19 @@ class RouteCollection extends LeagueRouteCollection
         parent::__construct($container, $parser, $generator);
 
         $this->addPatternMatcher('any', '\d\.\d');
+    }
+
+    public function getDispatcher(ServerRequestInterface $request)
+    {
+        if (is_null($this->getStrategy())) {
+            $this->setStrategy(new ApplicationStrategy);
+        }
+
+        $this->prepRoutes($request);
+
+        $dispatcher = new \Phprest\Router\Dispatcher($request, $this->getData());
+
+        return $dispatcher->setStrategy($this->getStrategy());
     }
 
     /**
@@ -55,5 +72,27 @@ class RouteCollection extends LeagueRouteCollection
     public function getRoutingTable(): array
     {
         return $this->routingTable;
+    }
+
+    public function dispatch(ServerRequestInterface $request, ResponseInterface $response)
+    {
+        $dispatcher = $this->getDispatcher($request);
+        $execChain  = $dispatcher->handle($request);
+
+        foreach ($this->getMiddlewareStack() as $middleware) {
+            $execChain->middleware($middleware);
+        }
+
+        try {
+            if ($execChain instanceof ResponseInterface) {
+                return $execChain;
+            }
+
+            return $execChain->execute($request, $response);
+        } catch (\Exception $exception) {
+            $middleware = $this->getStrategy()->getExceptionDecorator($exception);
+
+            return (new ExecutionChain)->middleware($middleware)->execute($request, $response);
+        }
     }
 }

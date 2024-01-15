@@ -2,18 +2,17 @@
 
 namespace Phprest\Router;
 
-use Closure;
 use Hateoas\Hateoas;
 use League\Container\ContainerInterface;
 use League\Container\Exception\NotFoundException;
 use League\Route\Route;
-use League\Route\Strategy\AbstractStrategy;
+use League\Route\Strategy\JsonStrategy;
 use League\Route\Strategy\StrategyInterface;
 use Phprest\HttpFoundation\Response;
 use Phprest\Service;
 use Symfony\Component\HttpFoundation\Request;
 
-class Strategy extends AbstractStrategy implements StrategyInterface
+class Strategy extends JsonStrategy implements StrategyInterface
 {
     use Service\Hateoas\Util;
 
@@ -79,5 +78,10 @@ class Strategy extends AbstractStrategy implements StrategyInterface
     protected function serviceHateoas(): Hateoas
     {
         return $this->getContainer()->get(Service\Hateoas\Config::getServiceName());
+    }
+
+    protected function getContainer()
+    {
+        return $this->container;
     }
 }

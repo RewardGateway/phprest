@@ -33,7 +33,7 @@ class RouteCollection extends LeagueRouteCollection
     public function getDispatcher(ServerRequestInterface $request)
     {
         if (is_null($this->getStrategy())) {
-            $this->setStrategy(new ApplicationStrategy);
+            $this->setStrategy(new ApplicationStrategy());
         }
 
         $this->prepRoutes($request);
@@ -92,7 +92,7 @@ class RouteCollection extends LeagueRouteCollection
         } catch (\Exception $exception) {
             $middleware = $this->getStrategy()->getExceptionDecorator($exception);
 
-            return (new ExecutionChain)->middleware($middleware)->execute($request, $response);
+            return (new ExecutionChain())->middleware($middleware)->execute($request, $response);
         }
     }
 }

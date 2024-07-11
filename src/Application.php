@@ -107,7 +107,7 @@ class Application implements
         $response = $app->handle($request, self::MASTER_REQUEST, false);
 
         $responseEmitter = new ResponseEmitter();
-        $responseEmitter->emit($response);
+        $responseEmitter->emit(RequestHelper::toPsrResponse($response));
     }
 
     /**
@@ -118,7 +118,7 @@ class Application implements
      *
      * @throws Exception
      */
-    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true): ?ResponseInterface
+    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true): ?Response
     {
         $this->getContainer()->add(Request::class, $request);
 

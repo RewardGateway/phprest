@@ -3,19 +3,37 @@
 namespace Phprest\Router;
 
 use League\Route\Dispatcher as LeagueDispatcher;
+use League\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class Dispatcher extends LeagueDispatcher
 {
     public function __construct(
         private readonly ServerRequestInterface $request,
-        $data
+        $data,
+        private readonly ContainerInterface $container
     ) {
         parent::__construct($data);
     }
 
-    protected function handleFound(callable $route, array $vars)
+    /**
+     * @param callable|array|string $route
+     */
+    protected function handleFound($route, array $vars)
     {
-        return call_user_func_array($route, array_merge([$this->request], $vars));
+        $controller = $route;
+
+        if (is_string($route) && str_contains($route, '::')) {
+            $controller = explode('::', $route);
+        }
+
+        if (is_array($controller)) {
+            $controller = [
+                (is_object($controller[0])) ? $controller[0] : $this->container->get($controller[0]),
+                $controller[1]
+            ];
+        }
+
+        return call_user_func_array($controller, array_merge([$this->request], array_values($vars)));
     }
 }

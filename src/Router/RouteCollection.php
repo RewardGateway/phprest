@@ -12,6 +12,7 @@ use League\Route\Strategy\ApplicationStrategy;
 use League\Route\Strategy\StrategyInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 class RouteCollection extends LeagueRouteCollection
 {
@@ -38,7 +39,7 @@ class RouteCollection extends LeagueRouteCollection
 
         $this->prepRoutes($request);
 
-        $dispatcher = new \Phprest\Router\Dispatcher($request, $this->getData());
+        $dispatcher = new \Phprest\Router\Dispatcher($request, $this->getData(), $this->container);
 
         return $dispatcher->setStrategy($this->getStrategy());
     }
@@ -84,7 +85,7 @@ class RouteCollection extends LeagueRouteCollection
         }
 
         try {
-            if ($execChain instanceof ResponseInterface) {
+            if ($execChain instanceof ResponseInterface || $execChain instanceof Response) {
                 return $execChain;
             }
 

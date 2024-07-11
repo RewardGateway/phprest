@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Phprest;
 
 use League\Container\Container as LeagueContainer;
+use League\Container\ContainerInterface;
 use League\Container\Definition\DefinitionFactory;
 use League\Container\Exception\NotFoundException;
 use ReflectionNamedType;
@@ -60,18 +61,23 @@ class Container extends LeagueContainer
 
             // if the dependency is a class, just register its name as an
             // argument with the definition
-            if (
-                $dependency instanceof ReflectionNamedType
-                && !$dependency->isBuiltin()
-                && (
-                    $this->hasShared($dependency->getName())
-                    || $this->has($dependency->getName())
-                    || class_exists($dependency->getName())
-                )
-            ) {
-                $definition->withArgument($this->get($dependency->getName()));
-                continue;
+            if ($dependency instanceof ReflectionNamedType && !$dependency->isBuiltin()) {
+                if ($dependency->getName() === ContainerInterface::class) {
+                    $definition->withArgument($this);
+                    continue;
+                }
+
+                if (
+                    $this->hasShared($dependency->getName()) ||
+                    $this->has($dependency->getName()) ||
+                    class_exists($dependency->getName())
+                ) {
+                    $definition->withArgument($this->get($dependency->getName()));
+                    continue;
+                }
             }
+
+
 
             // if the dependency is not a class we attempt to get a default value
             if ($param->isDefaultValueAvailable()) {

@@ -54,13 +54,26 @@ class ApplicationTest extends TestCase
         $request->headers->set('Accept', '*/*');
 
         $this->app->get('/1.0/welcome', static function (ServerRequestInterface $request) {
-            return RequestHelper::toPsrResponse(new Response('Hello Phprest World', 200));
+            return new Response('Hello Phprest World', 200);
         });
 
         ob_start();
         $this->app->run($request);
 
         $this->assertEquals('Hello Phprest World', ob_get_clean());
+    }
+
+    public function testRunWithRoute(): void
+    {
+        $request = Request::create('/welcome');
+        $request->server->set('HTTP_ACCEPT', '*/*');
+
+        $this->app->get('/1.0/welcome', '\Phprest\Test\Mock\Controller\TestController::testAction');
+
+        ob_start();
+        $this->app->run($request);
+
+        $this->assertEquals('["Hello Phprest World"]', ob_get_clean());
     }
 
     public function testRunNotFound(): void

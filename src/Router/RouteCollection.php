@@ -92,6 +92,7 @@ class RouteCollection extends LeagueRouteCollection
         } catch (\Exception $exception) {
             $middleware = $this->getStrategy()->getExceptionDecorator($exception);
 
+            /** @phpstan-ignore-next-line */
             return (new ExecutionChain())->middleware($middleware)->execute($request, $response);
         }
     }

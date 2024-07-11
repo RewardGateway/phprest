@@ -62,6 +62,8 @@ class Get extends Command
             ->setRows($routes);
         $table->render();
 
-        return Command::SUCCESS;
+        return 0;
+        // use constant once
+        //return Command::SUCCESS;
     }
 }

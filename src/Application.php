@@ -104,7 +104,7 @@ class Application implements
 
         $app = $this->stackBuilder->resolve($this);
 
-        $response = $app->handle($request, self::MAIN_REQUEST, false);
+        $response = $app->handle($request, self::MASTER_REQUEST, false);
 
         $responseEmitter = new ResponseEmitter();
         $responseEmitter->emit($response);
@@ -118,7 +118,7 @@ class Application implements
      *
      * @throws Exception
      */
-    public function handle(Request $request, $type = self::MAIN_REQUEST, $catch = true): ?ResponseInterface
+    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true): ?ResponseInterface
     {
         $this->getContainer()->add(Request::class, $request);
 

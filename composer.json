@@ -30,7 +30,7 @@
         "stack/builder": "^1.0",
         "symfony/console": "^4.4",
         "symfony/http-kernel": "^4.4",
-        "symfony/psr-http-message-bridge": "^2.3",
+        "symfony/psr-http-message-bridge": "^2.1",
         "willdurand/hateoas": "^3.8",
         "willdurand/negotiation": "^1.5"
     },

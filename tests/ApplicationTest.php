@@ -60,14 +60,14 @@ class ApplicationTest extends TestCase
     public function testRunWithRoute(): void
     {
         $request = Request::create('/welcome');
-        $request->server->set('HTTP_ACCEPT', '*/*');
+        $request->server->set('HTTP_ACCEPT', 'application/json');
 
         $this->app->get('/1.0/welcome', '\Phprest\Test\Mock\Controller\TestController::testAction');
 
         ob_start();
         $this->app->run($request);
 
-        $this->assertEquals('["Hello Phprest World"]', ob_get_clean());
+        $this->assertEquals('{"message":"Hello Phprest World"}', ob_get_clean());
     }
 
     public function testRunNotFound(): void

@@ -24,8 +24,14 @@ class Strategy extends JsonStrategy implements StrategyInterface
 
     public function getCallable(Route $route, array $vars): Closure
     {
-        return function (ServerRequestInterface $request, ResponseInterface $response, callable $next) use ($route, $vars) {
-
+        return function (
+            ServerRequestInterface $request,
+            ResponseInterface $response,
+            callable $next
+        ) use (
+            $route,
+            $vars
+        ) {
             $return = $this->invokeController($route->getCallable(), array_merge([$request], array_values($vars)));
 
             if (! $return instanceof ResponseInterface) {

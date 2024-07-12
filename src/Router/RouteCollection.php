@@ -10,6 +10,7 @@ use League\Route\Middleware\ExecutionChain;
 use League\Route\RouteCollection as LeagueRouteCollection;
 use League\Route\Strategy\ApplicationStrategy;
 use League\Route\Strategy\StrategyInterface;
+use Phprest\Util\RequestHelper;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,6 +21,9 @@ class RouteCollection extends LeagueRouteCollection
      * @var array keys: method, route, handler
      */
     protected array $routingTable = [];
+
+    /** @var ContainerInterface */
+    protected $container;
 
     public function __construct(
         ContainerInterface $container = null,
@@ -39,7 +43,7 @@ class RouteCollection extends LeagueRouteCollection
 
         $this->prepRoutes($request);
 
-        $dispatcher = new \Phprest\Router\Dispatcher($request, $this->getData(), $this->container);
+        $dispatcher = new Dispatcher($request, $this->getData(), $this->container);
 
         return $dispatcher->setStrategy($this->getStrategy());
     }
@@ -75,6 +79,11 @@ class RouteCollection extends LeagueRouteCollection
         return $this->routingTable;
     }
 
+    /**
+     * @param ServerRequestInterface $request
+     *
+     * @return Response
+     */
     public function dispatch(ServerRequestInterface $request, ResponseInterface $response)
     {
         $dispatcher = $this->getDispatcher($request);
@@ -85,16 +94,21 @@ class RouteCollection extends LeagueRouteCollection
         }
 
         try {
-            if ($execChain instanceof ResponseInterface || $execChain instanceof Response) {
+            if ($execChain instanceof ResponseInterface) {
+                return RequestHelper::toSymfonyResponse($execChain);
+            }
+            if ($execChain instanceof Response) {
                 return $execChain;
             }
 
-            return $execChain->execute($request, $response);
+            return RequestHelper::toSymfonyResponse($execChain->execute($request, $response));
         } catch (\Exception $exception) {
             $middleware = $this->getStrategy()->getExceptionDecorator($exception);
 
-            /** @phpstan-ignore-next-line */
-            return (new ExecutionChain())->middleware($middleware)->execute($request, $response);
+            return RequestHelper::toSymfonyResponse(
+                /** @phpstan-ignore-next-line */
+                (new ExecutionChain())->middleware($middleware)->execute($request, $response)
+            );
         }
     }
 }

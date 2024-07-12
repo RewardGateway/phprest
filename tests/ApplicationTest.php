@@ -53,7 +53,7 @@ class ApplicationTest extends TestCase
         $request = Request::create('/welcome');
         $request->headers->set('Accept', '*/*');
 
-        $this->app->get('/1.0/welcome', static function (ServerRequestInterface $request) {
+        $this->app->get('/1.0/welcome', static function (Request $request) {
             return new Response('Hello Phprest World', 200);
         });
 

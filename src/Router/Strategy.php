@@ -9,6 +9,7 @@ use League\Route\Route;
 use League\Route\Strategy\JsonStrategy;
 use League\Route\Strategy\StrategyInterface;
 use Phprest\Service;
+use Phprest\Util\RequestHelper;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
@@ -32,7 +33,11 @@ class Strategy extends JsonStrategy implements StrategyInterface
             $route,
             $vars
         ) {
-            $return = $this->invokeController($route->getCallable(), array_merge([$request], array_values($vars)));
+            $symfonyRequest = RequestHelper::toSymfonyRequest($request);
+            $return = $this->invokeController(
+                $route->getCallable(),
+                array_merge([$symfonyRequest], array_values($vars))
+            );
 
             if (! $return instanceof ResponseInterface) {
                 throw new RuntimeException(

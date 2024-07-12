@@ -4,6 +4,7 @@ namespace Phprest\Router;
 
 use League\Route\Dispatcher as LeagueDispatcher;
 use League\Container\ContainerInterface;
+use Phprest\Util\RequestHelper;
 use Psr\Http\Message\ServerRequestInterface;
 
 class Dispatcher extends LeagueDispatcher
@@ -34,6 +35,8 @@ class Dispatcher extends LeagueDispatcher
             ];
         }
 
-        return call_user_func_array($controller, array_merge([$this->request], array_values($vars)));
+        $symfonyRequest = RequestHelper::toSymfonyRequest($this->request);
+
+        return call_user_func_array($controller, array_merge([$symfonyRequest], array_values($vars)));
     }
 }

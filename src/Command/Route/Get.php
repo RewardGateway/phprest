@@ -28,12 +28,8 @@ class Get extends Command
     }
 
     /**
-     * @return void
-     *
      * Return type of this method doesn't match to extended method.
      * Keeping it generic to avoid future BC issues.
-     *
-     * @phpstan-ignore-next-line
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -65,5 +61,9 @@ class Get extends Command
             ->setHeaders(['Method', 'Route', 'Handler'])
             ->setRows($routes);
         $table->render();
+
+        return 0;
+        // use constant once
+        //return Command::SUCCESS;
     }
 }

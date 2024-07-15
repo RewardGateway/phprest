@@ -4,42 +4,31 @@ declare(strict_types=1);
 
 namespace Phprest;
 
+use League\Container\Container as LeagueContainer;
+use League\Container\ContainerInterface;
+use League\Container\Definition\DefinitionFactory;
+use League\Container\Exception\NotFoundException;
 use ReflectionNamedType;
 
-use function array_key_exists;
-use function class_exists;
-use function in_array;
-use function is_null;
-use function sprintf;
-use function mb_strtolower;
-
-class Container extends \League\Container\Container
+class Container extends LeagueContainer
 {
-    private const TYPES_TO_IGNORE = [
-        'bool',
-        'int',
-        'float',
-        'string',
-        'array',
-        'object',
-        'callable',
-        'iterable',
-        'resource',
-    ];
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isSingleton($alias)
+    public function get($alias, array $args = [])
     {
-        return (
-            array_key_exists($alias, $this->singletons)
-            || (
-                array_key_exists($alias, $this->items)
-                && isset($this->items[$alias]['singleton'])
-                && $this->items[$alias]['singleton'] === true
-            )
-        );
+        try {
+            return parent::get($alias, $args);
+        } catch (NotFoundException) {
+            return $this->attemptReflect($alias, $args);
+        }
+    }
+
+    public function attemptReflect($alias, $args = [])
+    {
+        try {
+            return $this->reflect($alias);
+        } catch (\Throwable $e) {
+            error_log('Could not reflect class: ' . $e->getMessage());
+            throw new NotFoundException();
+        }
     }
 
     /**
@@ -52,17 +41,18 @@ class Container extends \League\Container\Container
             $reflection  = new \ReflectionClass($class);
             $constructor = $reflection->getConstructor();
         } catch (\ReflectionException $e) {
-            throw new \League\Container\Exception\ReflectionException(sprintf(
+            throw new \ReflectionException(sprintf(
                 'Unable to reflect on the class [%s], does the class exist and is it properly autoloaded?',
                 $class
             ));
         }
 
-        $factory = $this->getDefinitionFactory();
-        $definition = $factory($class, $class, $this);
+        $factory = new DefinitionFactory();
+        $factory->setContainer($this);
+        $definition = $factory->getDefinition($class, $class);
 
-        if (is_null($constructor)) {
-            return $definition;
+        if (null === $constructor) {
+            return $definition->build();
         }
 
         // loop through dependencies and get aliases/values
@@ -71,18 +61,23 @@ class Container extends \League\Container\Container
 
             // if the dependency is a class, just register its name as an
             // argument with the definition
-            if (
-                $dependency instanceof ReflectionNamedType
-                && !in_array(mb_strtolower($dependency->getName()), self::TYPES_TO_IGNORE, true)
-                && (
-                    $this->isSingleton($dependency->getName())
-                    || $this->isRegistered($dependency->getName())
-                    || class_exists($dependency->getName())
-                )
-            ) {
-                $definition->withArgument($dependency->getName());
-                continue;
+            if ($dependency instanceof ReflectionNamedType && !$dependency->isBuiltin()) {
+                if ($dependency->getName() === ContainerInterface::class) {
+                    $definition->withArgument($this);
+                    continue;
+                }
+
+                if (
+                    $this->hasShared($dependency->getName()) ||
+                    $this->has($dependency->getName()) ||
+                    class_exists($dependency->getName())
+                ) {
+                    $definition->withArgument($this->get($dependency->getName()));
+                    continue;
+                }
             }
+
+
 
             // if the dependency is not a class we attempt to get a default value
             if ($param->isDefaultValueAvailable()) {
@@ -90,11 +85,11 @@ class Container extends \League\Container\Container
                 continue;
             }
 
-            throw new \League\Container\Exception\UnresolvableDependencyException(
+            throw new NotFoundException(
                 sprintf('Unable to resolve a non-class dependency of [%s] for [%s]', $param, $class)
             );
         }
 
-        return $definition;
+        return $definition->build();
     }
 }

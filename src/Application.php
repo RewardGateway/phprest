@@ -3,14 +3,16 @@
 namespace Phprest;
 
 use Closure;
-use Doctrine\Common\Annotations\AnnotationRegistry;
 use League\Container\ContainerAwareTrait;
 use League\Event\EmitterInterface;
 use League\Event\EmitterTrait;
 use League\Event\ListenerAcceptorInterface;
+use League\Route\Http\Exception\NotFoundException;
 use Phprest\Middleware\ApiVersion;
+use Phprest\Response\ResponseEmitter;
 use Phprest\Router\RouteCollection;
-use Phprest\Service;
+use Phprest\Util\RequestHelper;
+use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -103,40 +105,38 @@ class Application implements
         $app = $this->stackBuilder->resolve($this);
 
         $response = $app->handle($request, self::MASTER_REQUEST, false);
-        $response->send();
 
-        $app->terminate($request, $response);
+        $responseEmitter = new ResponseEmitter();
+        $responseEmitter->emit(RequestHelper::toPsrResponse($response));
     }
 
     /**
-     * Handle the request.
-     *
-     * @param Request $request
      * @param int $type
      * @param bool $catch
      *
-     * @return Response
      * @throws LogicException
      *
      * @throws Exception
      */
     public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true): ?Response
     {
-        // Passes the request to the container
         $this->getContainer()->add(Request::class, $request);
 
         try {
             $this->emit('request.received', $request);
 
-            $dispatcher = $this->getRouter()->getDispatcher();
-            $response = $dispatcher->dispatch(
-                $request->getMethod(),
-                $request->getPathInfo()
+            $router = $this->getRouter();
+
+            $response = $router->dispatch(
+                RequestHelper::toPsr($request),
+                RequestHelper::createResponse()
             );
 
             $this->emit('response.created', $request, $response);
 
             return $response;
+        } catch (\InvalidArgumentException) {
+            throw new NotFoundException();
         } catch (Exception $e) {
             if (!$catch) {
                 throw $e;

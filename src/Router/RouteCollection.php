@@ -6,20 +6,25 @@ use Closure;
 use FastRoute\DataGenerator;
 use FastRoute\RouteParser;
 use League\Container\ContainerInterface;
+use League\Route\Middleware\ExecutionChain;
+use League\Route\RouteCollection as LeagueRouteCollection;
+use League\Route\Strategy\ApplicationStrategy;
 use League\Route\Strategy\StrategyInterface;
+use Phprest\Util\RequestHelper;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Symfony\Component\HttpFoundation\Response;
 
-class RouteCollection extends \League\Route\RouteCollection
+class RouteCollection extends LeagueRouteCollection
 {
     /**
      * @var array keys: method, route, handler
      */
     protected array $routingTable = [];
 
-    /**
-     * @param ContainerInterface $container
-     * @param RouteParser $parser
-     * @param DataGenerator $generator
-     */
+    /** @var ContainerInterface */
+    protected $container;
+
     public function __construct(
         ContainerInterface $container = null,
         RouteParser $parser = null,
@@ -30,22 +35,35 @@ class RouteCollection extends \League\Route\RouteCollection
         $this->addPatternMatcher('any', '\d\.\d');
     }
 
+    public function getDispatcher(ServerRequestInterface $request)
+    {
+        if (is_null($this->getStrategy())) {
+            $this->setStrategy(new ApplicationStrategy());
+        }
+
+        $this->prepRoutes($request);
+
+        $dispatcher = new Dispatcher($request, $this->getData(), $this->container);
+
+        return $dispatcher->setStrategy($this->getStrategy());
+    }
+
     /**
      * Add a route to the collection.
      *
-     * @param  string                                   $method
-     * @param  string                                   $route
-     * @param  string|Closure                          $handler
-     * @param StrategyInterface $strategy
+     * @param  string $httpMethod
+     * @param  string $route
+     * @param  string|Closure $handler
+     * @param StrategyInterface|null $strategy
      *
      * @return RouteCollection
      */
-    public function addRoute($method, $route, $handler, StrategyInterface $strategy = null): RouteCollection
+    public function addRoute($httpMethod, $route, $handler, StrategyInterface $strategy = null): RouteCollection
     {
-        parent::addRoute($method, $route, $handler, $strategy);
+        parent::addRoute($httpMethod, $route, $handler);
 
         $this->routingTable[] = [
-            'method'    => $method,
+            'method'    => $httpMethod,
             'route'     => $route,
             'handler'   => $handler,
         ];
@@ -59,5 +77,38 @@ class RouteCollection extends \League\Route\RouteCollection
     public function getRoutingTable(): array
     {
         return $this->routingTable;
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     *
+     * @return Response
+     */
+    public function dispatch(ServerRequestInterface $request, ResponseInterface $response)
+    {
+        $dispatcher = $this->getDispatcher($request);
+        $execChain  = $dispatcher->handle($request);
+
+        foreach ($this->getMiddlewareStack() as $middleware) {
+            $execChain->middleware($middleware);
+        }
+
+        try {
+            if ($execChain instanceof ResponseInterface) {
+                return RequestHelper::toSymfonyResponse($execChain);
+            }
+            if ($execChain instanceof Response) {
+                return $execChain;
+            }
+
+            return RequestHelper::toSymfonyResponse($execChain->execute($request, $response));
+        } catch (\Exception $exception) {
+            $middleware = $this->getStrategy()->getExceptionDecorator($exception);
+
+            return RequestHelper::toSymfonyResponse(
+                /** @phpstan-ignore-next-line */
+                (new ExecutionChain())->middleware($middleware)->execute($request, $response)
+            );
+        }
     }
 }

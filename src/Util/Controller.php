@@ -3,16 +3,24 @@
 namespace Phprest\Util;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Hateoas\Hateoas;
+use JMS\Serializer\SerializerInterface;
 use League\Container\ContainerInterface;
 use League\Route\RouteCollection;
 use Phprest\Annotation\Route;
 use Phprest\Application;
 use ReflectionClass;
 use ReflectionMethod;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 abstract class Controller
 {
+    use CommonResponsesTrait;
+
     protected ContainerInterface $container;
+    private ?Request $request = null;
+    private ?Response $response = null;
 
     /**
      * @param ContainerInterface $container
@@ -25,6 +33,14 @@ abstract class Controller
         if ($registerRoutes) {
             $this->registerRoutes();
         }
+    }
+
+    public function getSerializer(): SerializerInterface
+    {
+        /** @var Hateoas $hateoas */
+        $hateoas = $this->getContainer()->get(\Phprest\Service\Hateoas\Config::getServiceName());
+
+        return $hateoas->getSerializer();
     }
 
     protected function registerRoutes(): void
@@ -79,5 +95,28 @@ abstract class Controller
     protected function getContainer()
     {
         return $this->container;
+    }
+
+    protected function getRequest(): Request
+    {
+        if (!$this->request) {
+            $this->request = $this->container->get(Request::class);
+        }
+
+        return $this->request;
+    }
+
+    protected function setResponse(Response $response): void
+    {
+        $this->response = $response;
+    }
+
+    protected function getResponse(): Response
+    {
+        if (!$this->response) {
+            $this->response = $this->container->get(Response::class);
+        }
+
+        return $this->response;
     }
 }

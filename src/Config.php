@@ -4,6 +4,7 @@ namespace Phprest;
 
 use InvalidArgumentException;
 use League\BooBoo\BooBoo;
+use League\Container\Container as LeagueContainer;
 use League\Container\ContainerInterface;
 use League\Event\Emitter as EventEmitter;
 use League\Event\EmitterInterface as EventEmitterInterface;
@@ -22,6 +23,7 @@ class Config
     protected string $vendor;
     protected string $apiVersion;
     protected bool $debug = false;
+    /** @var ContainerInterface&LeagueContainer */
     protected ContainerInterface $container;
     protected RouteCollection $router;
     protected EventEmitterInterface $eventEmitter;
@@ -74,6 +76,9 @@ class Config
         return $this->debug;
     }
 
+    /**
+     * @param ContainerInterface&LeagueContainer $container
+     */
     public function setContainer(ContainerInterface $container): self
     {
         $this->container = $container;
@@ -82,7 +87,7 @@ class Config
     }
 
     /**
-     * @return ContainerInterface
+     * @return ContainerInterface&LeagueContainer
      */
     public function getContainer()
     {

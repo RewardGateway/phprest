@@ -5,63 +5,74 @@ namespace Phprest\Router;
 use Closure;
 use Hateoas\Hateoas;
 use League\Container\ContainerInterface;
-use League\Route\Strategy\AbstractStrategy;
+use League\Route\Route;
+use League\Route\Strategy\JsonStrategy;
 use League\Route\Strategy\StrategyInterface;
-use Phprest\HttpFoundation\Response;
 use Phprest\Service;
-use Symfony\Component\HttpFoundation\Request;
+use Phprest\Util\RequestHelper;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use RuntimeException;
 
-class Strategy extends AbstractStrategy implements StrategyInterface
+class Strategy extends JsonStrategy implements StrategyInterface
 {
     use Service\Hateoas\Util;
 
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
+    public function __construct(
+        protected ContainerInterface $container
+    ) {
+    }
 
-    /**
-     * @param ContainerInterface $container
-     */
-    public function __construct(ContainerInterface $container)
+    public function getCallable(Route $route, array $vars): Closure
     {
-        $this->container = $container;
+        return function (
+            ServerRequestInterface $request,
+            ResponseInterface $response,
+            callable $next
+        ) use (
+            $route,
+            $vars
+        ) {
+            $symfonyRequest = RequestHelper::toSymfonyRequest($request);
+            $return = $this->invokeController(
+                $route->getCallable(),
+                array_merge([$symfonyRequest], array_values($vars))
+            );
+
+            if (! $return instanceof ResponseInterface) {
+                throw new RuntimeException(
+                    'Route callables must return an instance of (Psr\Http\Message\ResponseInterface)'
+                );
+            }
+
+            $response = $return;
+            $response = $next($request, $response);
+
+            if (! $response->hasHeader('content-type')) {
+                return $response->withHeader('content-type', 'application/json');
+            }
+
+            return $response;
+        };
     }
 
     /**
-     * Dispatch the controller, the return value of this method will bubble out and be
-     * returned by \League\Route\Dispatcher::dispatch, it does not require a response, however,
-     * beware that there is no output buffering by default in the router.
+     * Invoke a controller action
      *
-     * $controller can be one of three types but based on the type you can infer what the
-     * controller actually is:
-     *     - string   (controller is a named function)
-     *     - array    (controller is a class method [0 => ClassName, 1 => MethodName])
-     *     - \Closure (controller is an anonymous function)
-     *
-     * @param  string|array|Closure $controller
-     * @param  array $vars - named wildcard segments of the matched route
-     *
-     * @return mixed
+     * @param  string|array|\Closure $controller
+     * @param  array                 $vars
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function dispatch($controller, array $vars)
+    protected function invokeController($controller, array $vars = [])
     {
-        $request = $this->container->get(Request::class);
-
-        $response = $this->invokeController($controller, array_merge(
-            [$request],
-            array_values($vars)
-        ));
-
-        if ($response instanceof Response && $response->getContent() !== '') {
-            return $this->serialize(
-                $response->getContent(),
-                $request,
-                $response
-            );
+        if (is_array($controller)) {
+            $controller = [
+                (is_object($controller[0])) ? $controller[0] : $this->getContainer()->get($controller[0]),
+                $controller[1]
+            ];
         }
 
-        return $response;
+        return call_user_func_array($controller, array_values($vars));
     }
 
     /**
@@ -72,5 +83,10 @@ class Strategy extends AbstractStrategy implements StrategyInterface
     protected function serviceHateoas(): Hateoas
     {
         return $this->getContainer()->get(Service\Hateoas\Config::getServiceName());
+    }
+
+    protected function getContainer()
+    {
+        return $this->container;
     }
 }

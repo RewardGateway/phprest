@@ -16,7 +16,7 @@ trait Getter
     /**
      * Returns the DI container.
      *
-     * @return Container|ContainerInterface
+     * @return Container&ContainerInterface
      */
     abstract protected function getContainer();
 }

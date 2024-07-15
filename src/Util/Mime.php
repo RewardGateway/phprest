@@ -2,6 +2,8 @@
 
 namespace Phprest\Util;
 
+use League\Container\Container;
+use League\Container\ContainerInterface;
 use Phprest\Application;
 use Phprest\Util\DataStructure\MimeProcessResult;
 
@@ -41,5 +43,8 @@ trait Mime
         return new MimeProcessResult($mime, $vendor, $apiVersion, $format);
     }
 
+    /**
+     * @return ContainerInterface&Container
+     */
     abstract protected function getContainer();
 }

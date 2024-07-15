@@ -24,6 +24,6 @@ class Service implements Serviceable
 
         $logger = new Logger($config->name, $config->handlers);
 
-        $container->add($config->getServiceName(), $logger);
+        $container->share($config->getServiceName(), $logger);
     }
 }

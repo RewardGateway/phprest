@@ -6,6 +6,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Removed
 - Removed willdurand/negotiation dependency as it was barely used and had breaking API changes
+- Removed PHP 8.1 from GitHub Actions workflow (no longer supported)
 
 ### Changed
 - Implemented internal Accept header parsing for content negotiation

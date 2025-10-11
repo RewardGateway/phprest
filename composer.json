@@ -30,7 +30,7 @@
         "symfony/console": "^4.4",
         "symfony/http-kernel": "^4.4",
         "willdurand/hateoas": "^3.8",
-        "willdurand/negotiation": "^1.5"
+        "willdurand/negotiation": "^3.0"
     },
     "require-dev": {
         "mockery/mockery": "^1.4",
@@ -69,5 +69,7 @@
     },
     "config": {
         "sort-packages": true
-    }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }

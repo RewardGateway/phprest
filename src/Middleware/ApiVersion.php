@@ -3,7 +3,6 @@
 namespace Phprest\Middleware;
 
 use League\Container\ContainerInterface;
-use Negotiation\FormatNegotiator;
 use Phprest\Application;
 use Phprest\HttpFoundation\Request;
 use Phprest\Util;
@@ -33,7 +32,7 @@ class ApiVersion implements HttpKernelInterface
     {
         $request        = new Request($request);
         $mimeProcResult = $this->processMime(
-            (new FormatNegotiator())->getBest($request->headers->get('Accept', '*/*'))->getValue()
+            $this->getBestMediaType($request->headers->get('Accept', '*/*'))
         );
 
         $request->setApiVersion(
@@ -49,5 +48,38 @@ class ApiVersion implements HttpKernelInterface
     public function getContainer()
     {
         return $this->app->getConfiguration()->getContainer();
+    }
+
+    /**
+     * Parse Accept header and return the best media type based on quality values
+     *
+     * @param string $acceptHeader
+     * @return string
+     */
+    private function getBestMediaType(string $acceptHeader): string
+    {
+        $parts = explode(',', $acceptHeader);
+        $best = ['type' => '*/*', 'quality' => 0];
+
+        foreach ($parts as $part) {
+            $part = trim($part);
+            $segments = explode(';', $part);
+            $mediaType = trim($segments[0]);
+            $quality = 1.0;
+
+            // Check for quality parameter
+            foreach (array_slice($segments, 1) as $param) {
+                if (preg_match('/q\s*=\s*([0-9.]+)/', $param, $matches)) {
+                    $quality = (float)$matches[1];
+                    break;
+                }
+            }
+
+            if ($quality > $best['quality'] || ($quality === $best['quality'] && $best['type'] === '*/*')) {
+                $best = ['type' => $mediaType, 'quality' => $quality];
+            }
+        }
+
+        return $best['type'];
     }
 }

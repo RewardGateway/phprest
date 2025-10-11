@@ -4,10 +4,11 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-### Changed
-- Upgraded willdurand/negotiation from ^1.5 to ^3.0 for better PHP 8.1+ compatibility
+### Removed
+- Removed willdurand/negotiation dependency as it was barely used and had breaking API changes
 
-### Added
+### Changed
+- Implemented internal Accept header parsing for content negotiation
 - Added composer minimum-stability and prefer-stable configuration
 
 ## [0.1.0] - 2015-09-22

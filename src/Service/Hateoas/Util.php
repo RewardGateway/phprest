@@ -5,7 +5,6 @@ namespace Phprest\Service\Hateoas;
 use Hateoas\Hateoas;
 use JMS\Serializer\DeserializationContext;
 use JMS\Serializer\SerializationContext;
-use Negotiation\FormatNegotiator;
 use Phprest\Exception;
 use Phprest\Util\Mime;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,7 +26,7 @@ trait Util
     protected function serialize($value, Request $request, Response $response)
     {
         $mimeProcResult = $this->processMime(
-            (new FormatNegotiator())->getBest($request->headers->get('Accept', '*/*'))->getValue()
+            $this->getBestMediaType($request->headers->get('Accept', '*/*'))
         );
 
         if ($mimeProcResult->mime === '*/*') {
@@ -81,4 +80,37 @@ trait Util
      * @return Hateoas
      */
     abstract protected function serviceHateoas();
+
+    /**
+     * Parse Accept header and return the best media type based on quality values
+     *
+     * @param string $acceptHeader
+     * @return string
+     */
+    private function getBestMediaType(string $acceptHeader): string
+    {
+        $parts = explode(',', $acceptHeader);
+        $best = ['type' => '*/*', 'quality' => 0];
+
+        foreach ($parts as $part) {
+            $part = trim($part);
+            $segments = explode(';', $part);
+            $mediaType = trim($segments[0]);
+            $quality = 1.0;
+
+            // Check for quality parameter
+            foreach (array_slice($segments, 1) as $param) {
+                if (preg_match('/q\s*=\s*([0-9.]+)/', $param, $matches)) {
+                    $quality = (float)$matches[1];
+                    break;
+                }
+            }
+
+            if ($quality > $best['quality'] || ($quality === $best['quality'] && $best['type'] === '*/*')) {
+                $best = ['type' => $mediaType, 'quality' => $quality];
+            }
+        }
+
+        return $best['type'];
+    }
 }

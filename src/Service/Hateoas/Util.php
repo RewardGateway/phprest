@@ -87,7 +87,7 @@ trait Util
      * @param string $acceptHeader
      * @return string
      */
-    private function getBestMediaType(string $acceptHeader): string
+    protected function getBestMediaType(string $acceptHeader): string
     {
         $parts = explode(',', $acceptHeader);
         $best = ['type' => '*/*', 'quality' => 0];

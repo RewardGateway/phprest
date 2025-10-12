@@ -132,4 +132,66 @@ EOD
     {
         return $this->container;
     }
+
+    /**
+     * @dataProvider bestMediaTypeProvider
+     */
+    public function testGetBestMediaType(string $acceptHeader, string $expected): void
+    {
+        $this->container->add(Application::CONTAINER_ID_VENDOR, 'phprest');
+        $this->container->add(Application::CONTAINER_ID_API_VERSION, '2.4');
+
+        (new Service())->register($this->container, new Config(true));
+
+        // Call the protected method using reflection
+        $reflection = new \ReflectionClass($this);
+        $method = $reflection->getMethod('getBestMediaType');
+        $method->setAccessible(true);
+
+        $result = $method->invoke($this, $acceptHeader);
+        $this->assertEquals($expected, $result);
+    }
+
+    public function bestMediaTypeProvider(): array
+    {
+        return [
+            'simple wildcard' => ['*/*', '*/*'],
+            'simple json' => ['application/json', 'application/json'],
+            'simple xml' => ['application/xml', 'application/xml'],
+            'vendor specific json' => ['application/vnd.phprest-v2.4+json', 'application/vnd.phprest-v2.4+json'],
+            'vendor specific xml' => ['application/vnd.phprest-v2.4+xml', 'application/vnd.phprest-v2.4+xml'],
+            'multiple with quality - html preferred' => [
+                'text/html, application/xhtml+xml, application/xml;q=0.9, */*;q=0.8',
+                'text/html'
+            ],
+            'multiple with quality - json preferred' => [
+                'application/json;q=1.0, application/xml;q=0.5',
+                'application/json'
+            ],
+            'multiple with quality - xml preferred' => [
+                'application/json;q=0.5, application/xml;q=0.9',
+                'application/xml'
+            ],
+            'quality with spaces' => [
+                'application/json; q=0.8, application/xml; q=0.9',
+                'application/xml'
+            ],
+            'equal quality - first wins' => [
+                'application/json;q=0.9, application/xml;q=0.9',
+                'application/json'
+            ],
+            'complex vendor with version parameter' => [
+                'application/vnd.api+json;version=1',
+                'application/vnd.api+json'
+            ],
+            'mixed priorities with wildcard' => [
+                'text/html;q=0.9, application/json;q=1.0, */*;q=0.8',
+                'application/json'
+            ],
+            'default quality of 1.0' => [
+                'application/json, application/xml;q=0.5',
+                'application/json'
+            ],
+        ];
+    }
 }

@@ -13,5 +13,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Added composer minimum-stability and prefer-stable configuration
 - Updated minimum PHP version requirement from ^8.1 to ^8.2
 
+### Added
+- Added comprehensive unit tests for getBestMediaType method in ApiVersion middleware
+- Added comprehensive unit tests for getBestMediaType method in Hateoas Util trait
+
 ## [0.1.0] - 2015-09-22
 First release.
